@@ -16,18 +16,18 @@ if __name__ == "__main__":
     #语料句子
     smdict={}
     for _ in range(1,12):
-#        text=reform(open('../sina_news/2016-%02d.txt'%_).read())
-        text=open('../sina_news/2016-%02d.txt'%_).read()
+        text='123456'
         for i in range(0,len(text)-1):
             smtext=text[i:i+2]
             word=text[i]
-            if smdict.hasattr(word):
+            if word in smdict:
                 bigdict=smdict[word]
-                if bigdict.hasattr(smtext):
+                if smtext in bigdict:
                     bigdict[smtext]+=1
                 else:
                     bigdict[smtext]=1
             else:
                 smdict[word]={smtext:1}
-    print(smdict)
+    with open('dict2c','wb') as f:
+        pickle.dump(smdict,f)
 
