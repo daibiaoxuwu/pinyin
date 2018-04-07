@@ -1,5 +1,4 @@
 import jieba
-from _overlapped import NULL
 
 
 #将句子变为"BOSxxxxxEOS"这种形式
@@ -14,7 +13,7 @@ def reform(sentence):
 
 
 #分词并统计词频
-def segmentation(sentence,lists,dicts=NULL):
+def segmentation(sentence,lists,dicts=None):
     jieba.suggest_freq("BOS", True)
     jieba.suggest_freq("EOS", True)
     sentence = jieba.cut(sentence,HMM=False)
@@ -22,7 +21,7 @@ def segmentation(sentence,lists,dicts=NULL):
     #将词按","分割后依次填入数组word_list[]
     lists=format_sentence.split(",")
     #统计词频，如果词在字典word_dir{}中出现过则+1，未出现则=1
-    if dicts!=NULL:
+    if dicts!=None:
         for word in lists:
             if word not in dicts:
                 dicts[word]=1
@@ -61,25 +60,26 @@ def probability(test_list,count_list,ori_dict):
 if __name__ == "__main__":
 
     #语料句子
-    sentence_ori="研究生物很有意思。他大学时代是研究生物的。生物专业是他的首选目标。他是研究生。"
-    ori_list=[]
-    ori_dict={}
-    sentence_ori_temp=""
+    for _ in range(1,12):
+        sentence_ori=open('../sina_news/2016-%02d.txt'%_).read()
+        ori_list=[]
+        ori_dict={}
+        sentence_ori_temp=""
 
-    #测试句子
-    sentence_test="他是研究生物的"
-    sentence_test_temp="" 
-    test_list=[]
-    count_list=[]
-    p=0
+        #测试句子
+        sentence_test="他是研究生物的"
+        sentence_test_temp="" 
+        test_list=[]
+        count_list=[]
+        p=0
 
-    #分词并将结果存入一个list，词频统计结果存入字典
-    sentence_ori_temp=reform(sentence_ori)
-    ori_list=segmentation(sentence_ori_temp,ori_list,ori_dict)
+        #分词并将结果存入一个list，词频统计结果存入字典
+        sentence_ori_temp=reform(sentence_ori)
+        ori_list=segmentation(sentence_ori_temp,ori_list,ori_dict)
 
-    sentence_test_temp=reform(sentence_test)
-    test_list=segmentation(sentence_test_temp,test_list)
+        sentence_test_temp=reform(sentence_test)
+        test_list=segmentation(sentence_test_temp,test_list)
 
-    count_list=compareList(ori_list, test_list)
-    p=probability(test_list,count_list,ori_dict)
-    print(p)
+        count_list=compareList(ori_list, test_list)
+        p=probability(test_list,count_list,ori_dict)
+        print(p)
