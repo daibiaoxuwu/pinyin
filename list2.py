@@ -47,7 +47,7 @@ def total(smdict):
   #      print('i',type(i),i)
  #       input()
         tempdict={}
-        totalsum=0
+        totalsum={}
         for j in smdict[i]:
 #            print('j',type(j),j,smdict[i][j],j[0],j[1])
             if j[1] not in voicedict:#标点符号
@@ -57,13 +57,14 @@ def total(smdict):
             else:
                 voice=voicedict[j[1]] 
                 if voice in tempdict:#已经加入了二级dict,放入三级dict
-                    if j[1] in tempdict[voice]:
-                        tempdict[voice][j[1]]+=smdict[i][j]
-                    else:
-                        tempdict[voice][j[1]]=smdict[i][j]
-                    totalsum+=1
+                    tempdict[voice][j[1]]=smdict[i][j]
+                    totalsum[voice]+=smdict[i][j]
                 else:
-                    tempdict[voice]={j[1]:1}
+                    tempdict[voice]={j[1]:smdict[i][j]}
+                    totalsum[voice]=smdict[i][j]
+        for voice in tempdict:
+            for word in tempdict[voice]:
+                tempdict[voice][word]/=totalsum[voice]
 
         newdict[i]=tempdict
     with open('errorverse','wb') as f:
