@@ -1,5 +1,8 @@
 import pickle
 import json
+#import sys
+#reload(sys)
+#sys.setdefaultencoding('gbk')
 
 
 #将句子变为"BOSxxxxxEOS"这种形式
@@ -27,8 +30,8 @@ def listtags(text,smdict):
 
 def total(smdict):
     voicedict={}
-    with open('拼音汉字表.txt') as f:
-        a=f.readline()
+    with open('../拼音汉字表.txt',encoding='gbk') as f:
+        a=f.readline()#.encode('gbk')
         while(a!=''):
             b=a.split()
             for c in b[1:]:
@@ -39,8 +42,10 @@ def total(smdict):
     newdict={}
     pointset=set()
     for i in smdict:
+        print('i',type(i),i)
         tempdict={}
-        for j in i:
+        for j in smdict[i]:
+            print('j',type(j),j)
             if j[1] not in voicedict:#标点符号
                 if j[1] not in pointset:
                     print('errorverse',j[1])
@@ -62,6 +67,7 @@ def total(smdict):
 if __name__ == "__main__":
     with open('dict2c','rb') as f:
         smdict=pickle.load(f)
+    print(smdict)
     print('loadedsmdict')
 
     with open('dict2ctotal','wb') as f:
