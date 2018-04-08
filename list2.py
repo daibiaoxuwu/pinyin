@@ -37,15 +37,19 @@ def total(smdict):
             for c in b[1:]:
                 voicedict[c]=b[0]
             a=f.readline()
+            print(a)
     print('loadedvoice')
+    input()
 
     newdict={}
     pointset=set()
     for i in smdict:
-        print('i',type(i),i)
+  #      print('i',type(i),i)
+ #       input()
         tempdict={}
+        totalsum=0
         for j in smdict[i]:
-            print('j',type(j),j)
+#            print('j',type(j),j,smdict[i][j],j[0],j[1])
             if j[1] not in voicedict:#标点符号
                 if j[1] not in pointset:
                     print('errorverse',j[1])
@@ -54,12 +58,16 @@ def total(smdict):
                 voice=voicedict[j[1]] 
                 if voice in tempdict:#已经加入了二级dict,放入三级dict
                     if j[1] in tempdict[voice]:
-                        tempdict[voice][j[1]]+=1
+                        tempdict[voice][j[1]]+=smdict[i][j]
                     else:
-                        tempdict[voice][j[1]]=1
+                        tempdict[voice][j[1]]=smdict[i][j]
+                    totalsum+=1
                 else:
                     tempdict[voice]={j[1]:1}
+
         newdict[i]=tempdict
+    with open('errorverse','wb') as f:
+        pickle.dump(pointset,f)
     return newdict
 
 
@@ -67,7 +75,7 @@ def total(smdict):
 if __name__ == "__main__":
     with open('dict2c','rb') as f:
         smdict=pickle.load(f)
-    print(smdict)
+#    print(smdict)
     print('loadedsmdict')
 
     with open('dict2ctotal','wb') as f:
