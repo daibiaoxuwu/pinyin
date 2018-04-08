@@ -25,16 +25,45 @@ def listtags(text,smdict):
             smdict[word]={smtext:1}
     return smdict
 
-if __name__ == "__main__":
+def total(smdict):
+    voicedict={}
+    with open('拼音汉字表.txt') as f:
+        a=f.readline()
+        while(a!=''):
+            b=a.split()
+            for c in b[1:]:
+                voicedict[c]=b[0]
+            a=f.readline()
+    print('loadedvoice')
 
-    #语料句子
-    smdict={}
-    for _ in range(1,12):
-        #text=open('../sina_news/2016-%02d.txt'%_).read()
-        for text in open('../sina_news/2016-%02d.txt'%_).readlines():
-            smdict=listtags(json.loads(text)['html'],smdict)
-            smdict=listtags(json.loads(text)['title'],smdict)
-        print('one')
-    with open('dict2c','wb') as f:
-        pickle.dump(smdict,f)
+    newdict={}
+    pointset=set()
+    for i in smdict:
+        tempdict={}
+        for j in i:
+            if j[1] not in voicedict:#标点符号
+                if j[1] not in pointset:
+                    print('errorverse',j[1])
+                    pointset.add(j[1])
+            else:
+                voice=voicedict[j[1]] 
+                if voice in tempdict:#已经加入了二级dict,放入三级dict
+                    if j[1] in tempdict[voice]:
+                        tempdict[voice][j[1]]+=1
+                    else:
+                        tempdict[voice][j[1]]=1
+                else:
+                    tempdict[voice]={j[1]:1}
+        newdict[i]=tempdict
+    return newdict
+
+
+
+if __name__ == "__main__":
+    with open('dict2c','rb') as f:
+        smdict=pickle.load(f)
+    print('loadedsmdict')
+
+    with open('dict2ctotal','wb') as f:
+        pickle.dump(total(smdict),f)
 
