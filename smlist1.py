@@ -15,8 +15,8 @@ if __name__ == "__main__":
  
     #语料句子
     smdict={}
-    for _ in range(1,12):
-        text='123456'
+    for _ in range(1,2):
+        text='今天天田气不错,不过我没有去公园.'
         for i in range(0,len(text)-1):
             smtext=text[i:i+2]
             word=text[i]

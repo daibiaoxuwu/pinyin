@@ -73,7 +73,7 @@ def total(smdict):
 
 
 if __name__ == "__main__":
-    with open('dict2c','rb') as f:
+    with open('dict2ctotal2','rb') as f:
         smdict=pickle.load(f)
     print(smdict)
     '''

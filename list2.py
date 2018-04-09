@@ -37,9 +37,7 @@ def total(smdict):
             for c in b[1:]:
                 voicedict[c]=b[0]
             a=f.readline()
-            print(a)
     print('loadedvoice')
-    input()
 
     newdict={}
     pointset=set()
@@ -76,9 +74,10 @@ def total(smdict):
 if __name__ == "__main__":
     with open('dict2c','rb') as f:
         smdict=pickle.load(f)
-#    print(smdict)
+    #print(smdict)
     print('loadedsmdict')
 
     with open('dict2ctotal','wb') as f:
         pickle.dump(total(smdict),f)
+        #print(total(smdict))
 
