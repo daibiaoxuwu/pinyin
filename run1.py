@@ -36,7 +36,6 @@ def loadvoice(path):
             for c in b[1:]:
                 voicedict[c]=b[0]
             a=f.readline()
-    print('loadedvoice')
     return rvdict,voicedict
 
 def work(line,smdict,rvdict,voicedict,pointset):
@@ -69,10 +68,11 @@ def work(line,smdict,rvdict,voicedict,pointset):
         if newpower < oldpower[k]:
             newpower= oldpower[k]
             newsent=oldsent[k]
-    print(newsent)
+    return newsent
 
 if __name__ == "__main__":
 
+#    with open('dict2clog','rb') as f:
     with open('dict2c','rb') as f:
         smdict=pickle.load(f)
 
