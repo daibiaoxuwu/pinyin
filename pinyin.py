@@ -16,7 +16,7 @@ def reform(sentence):
 def listtags(text,smdict,f):
     text=re.sub('\s+','.',text)
     f.write(text+'\n')
-    f.write(' '.join(lazy_pinyin(text,errors='ignore'))+'\n')
+    f.write(' '.join(lazy_pinyin(text)+'\n')
     return
 
 if __name__ == "__main__":

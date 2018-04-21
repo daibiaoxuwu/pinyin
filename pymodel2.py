@@ -5,7 +5,7 @@ PAD = 0
 EOS = 1
 vocab_size = 672
 output_size= 114
-input_embedding_size = 20
+input_embedding_size = 1000
 encoder_hidden_units = 20
 decoder_hidden_units = 20
 batch_size = 100
@@ -46,14 +46,18 @@ with train_graph.as_default():
     )
     loss = tf.reduce_mean(stepwise_cross_entropy)
     train_op = tf.train.AdamOptimizer().minimize(loss)
+    saver=tf.train.Saver()
 
 loss_track = []
-epochs = 3001
+epochs = 30000001
+
 
 with tf.Session(graph=train_graph) as sess:
     sess.run(tf.global_variables_initializer())
-    for epoch in range(epochs):
-        inputs,pads,answers = model.list_tags(batch_size=batch_size)
+    ckpt = tf.train.get_checkpoint_state('tense/py')
+    saver.restore(sess, ckpt.model_checkpoint_path)
+    for epoch in range(1,epochs):
+        answers,pads,inputs = model.list_tags(batch_size=batch_size)
 
         decoder_targets_ = [(sequence) + [EOS] for sequence in answers]
         decoder_inputs_ = [[EOS] + (sequence) for sequence in answers]
@@ -62,12 +66,14 @@ with tf.Session(graph=train_graph) as sess:
                      }
         _, l = sess.run([train_op, loss], feed_dict)
         loss_track.append(l)
-        if epoch == 0 or epoch % 1000 == 0:
+        if epoch == 1 or epoch % 100 == 0:
+            print('saved to: ', saver.save(sess,'tense/py/py.ckpt',global_step=epoch))
             print('loss: {}'.format(sess.run(loss, feed_dict)))
+        if epoch % 500 == 0:
             predict_ = sess.run(decoder_prediction, feed_dict)
-            for i, (inp, pred) in enumerate(zip(feed_dict[encoder_inputs].T, predict_.T)):
-                print('input > {}'.format(inp))
-                print('predicted > {}'.format(pred))
-                if i >= 20:
-                    break
+           # for i, (inp, pred) in enumerate(zip(np.array(feed_dict[encoder_inputs]).T, predict_.T)):
+           #     print('input > {}'.format(inp))
+           #     print('predicted > {}'.format(pred))
+           #     if i >= 20:
+           #         break
 

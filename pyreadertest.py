@@ -15,12 +15,12 @@ from queue import Queue
 
 
 class reader(object):
-    def __init__(self, maxlength=400):
+    def __init__(self):
 
 #patchlength:每次输入前文额外的句子的数量.
 #maxlength:每句话的最大长度.(包括前文额外句子).超过该长度的句子会被丢弃.
 #embedding_size:词向量维度数.
-        self.maxlength=maxlength
+        self.maxlength=400
 
         
         dir0=''
@@ -52,65 +52,32 @@ class reader(object):
        #     self.widict = pickle.load(f)        #汉字
        # print('w',len(self.widict))
 
-        self.resp=open('../pinyin').readlines()
-        self.readlength=len(self.resp)
-        self.pointer=0
         
 
-    def work(self,a1,b1,inputs,pads,answers):
+    def work(self,b1,inputs,pads,answers):
 #        for i in a1:
-#            if i not in self.widict:
-#                self.widict[i]=len(self.widict)
-        aa=[self.widict[i]+2 for i in a1]
-        aa.append(1)
-
- #       for i in b1:
- #           if i not in self.vidict:
  #               self.vidict[i]=len(self.vidict)
         bb=[self.vidict[i]+2 for i in b1]
         bb.append(1)
 
-        aa=np.array(aa)
         bb=np.array(bb)
 #补零
-        if(aa.shape[0]!=bb.shape[0]):
-            return False
-        pads.append(aa.shape[0])
-        aa=np.pad(aa,(0,self.maxlength-aa.shape[0]),'constant')
+        pads.append(bb.shape[0])
         bb=np.pad(bb,(0,self.maxlength-bb.shape[0]),'constant')
-        inputs.append(aa)
-        answers.append(bb)
+        inputs.append(bb)
         return True
 
-    def list_tags(self,batch_size):
-        while True:#防止读到末尾
+    def list_tags(self,content):
             inputs=[]
             pads=[]
             answers=[]
-            while len(inputs)<batch_size:
-                if self.pointer==self.readlength:
-                    self.pointer=0
-                    return None,None,None,None,None,None
-                a0=self.resp[self.pointer]#汉字
-                a=''
-                for i in a0:
-                    if i in self.widict:
-                        a+=i
-                '''
-                if len(a)<5:
-                    print('tooshort',a)
-                    self.pointer+=1
-                    continue
-                '''
-                b=self.resp[self.pointer+1].split()#拼音
-                self.pointer+=2
-                while len(a)>self.maxlength-10:
-                    a1=a[:self.maxlength-10]
-                    b1=b[:self.maxlength-10]
-                    if self.work(a1,b1,inputs,pads,answers)==False:continue
-                    a=a[self.maxlength-10:]
-                    b=b[self.maxlength-10:]
-                if self.work(a,b,inputs,pads,answers)==False:continue
+
+            b=content.split()#拼音
+            while len(b)>self.maxlength-10:
+                b1=b[:self.maxlength-10]
+                self.work(b1,inputs,pads,answers)
+                b=b[self.maxlength-10:]
+            self.work(b,inputs,pads,answers)
             return inputs,pads,answers
 
 if __name__ == '__main__':
