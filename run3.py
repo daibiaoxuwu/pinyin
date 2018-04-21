@@ -80,8 +80,8 @@ def work(line,jiebasm,jiebasg,rvdict,voicedict):
 
 if __name__ == "__main__":
 
+    rvdict,voicedict=loadvoice('../拼音汉字表.txt')
 #    with open('dict2clog','rb') as f:
-    '''
     with open('../jiebasm','rb') as f:
         jiebasm=pickle.load(f)
     with open('../jiebasg','rb') as f:
@@ -91,8 +91,7 @@ if __name__ == "__main__":
     jiebasg={'于': 1, '在': 1, '，': 1, '后': 1}
     jiebasg={'于': 1, '在': 1, '，': 1, '后': 1, '晓': 4}
 
-    rvdict,voicedict=loadvoice('../拼音汉字表.txt')
-
+    ''' 
     #小明硕士毕业于中国科学院计算所，后在日本京都大学深造"
     a='xiao ming shuo shi bi ye yu zhong guo ke xue yuan ji suan suo hou zai ri ben jing du da xue shen zao'
     print(work(a,jiebasm,jiebasg,rvdict,voicedict))
