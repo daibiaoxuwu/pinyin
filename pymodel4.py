@@ -187,6 +187,9 @@ def make_batch(inputs, max_sequence_length=None):
 
 def next_feed():
     answers,inputs = model.list_tags(batch_size=batch_size)
+    if answers==None:
+        print('epoch')
+        answers,inputs = model.list_tags(batch_size=batch_size)
     encoder_inputs_, encoder_input_lengths_ = make_batch(inputs)
     decoder_targets_, _ = make_batch(
         [(sequence) + [EOS] + [PAD] * 2 for sequence in answers]

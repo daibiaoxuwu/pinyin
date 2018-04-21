@@ -82,7 +82,7 @@ class reader(object):
             while len(inputs)<batch_size:
                 if self.pointer==self.readlength:
                     self.pointer=0
-                    return None,None,None,None,None,None
+                    return None,None
                 a0=self.resp[self.pointer]#汉字
                 a=''
                 for i in a0:
