@@ -60,6 +60,7 @@ def total(smdict):
                 else:
                     tempdict[voice]={j[1]:smdict[i][j]}
                     totalsum[voice]=smdict[i][j]
+        #除法,'安quan':'全'+'权'+'...'的和是1
         for voice in tempdict:
             for word in tempdict[voice]:
                 tempdict[voice][word]/=totalsum[voice]
