@@ -2,6 +2,8 @@
 import numpy as np
 import tensorflow as tf
 import os
+from pyreader import reader
+model=reader()
 os.environ["CUDA_VISIBLE_DEVICES"]=""#环境变量：使用第一块gpu
 
 
@@ -13,8 +15,8 @@ EOS = 1
 # UNK = 2
 # GO  = 3
 
-vocab_size = 10
-input_embedding_size = 20
+vocab_size = 672
+input_embedding_size = 1000
 
 encoder_hidden_units = 20
 decoder_hidden_units = encoder_hidden_units * 2
@@ -185,15 +187,11 @@ def make_batch(inputs, max_sequence_length=None):
 
 
 def next_feed():
-    batch = next(batches)
-    encoder_inputs_, encoder_input_lengths_ = make_batch(batch)
-    decoder_targets_, _ = make_batch(
-        [(sequence) + [EOS] + [PAD] * 2 for sequence in batch]
-    )
+    answers,pads,inputs = model.list_tags(batch_size=batch_size)
     return {
-        encoder_inputs: encoder_inputs_,
-        encoder_inputs_length: encoder_input_lengths_,
-        decoder_targets: decoder_targets_,
+        encoder_inputs: inputs,
+        encoder_inputs_length: pads,
+        decoder_targets: answers
     }
 
 print('0')
@@ -201,7 +199,7 @@ saver=tf.train.Saver()
 with tf.Session() as sess:
     print('0')
     sess.run(tf.global_variables_initializer())
-    #ckpt = tf.train.get_checkpoint_state('tense/py3')
+    #ckpt = tf.train.get_checkpoint_state('tense/py4')
     #saver.restore(sess, ckpt.model_checkpoint_path)
     print('1')
     batch_size = 100
@@ -223,7 +221,7 @@ with tf.Session() as sess:
             loss_track.append(l)
 
             if batch == 0 or batch % batches_in_epoch == 0:
-                print('saved to: ', saver.save(sess,'tense/py3/py3.ckpt',global_step=batch))
+                print('saved to: ', saver.save(sess,'tense/py4/py4.ckpt',global_step=batch))
                 print('batch {}'.format(batch)+'  minibatch loss: {}'.format(sess.run(loss, fd)))
                 predict_ = sess.run(decoder_prediction, fd)
                 for i, (inp, pred) in enumerate(zip(fd[encoder_inputs].T, predict_.T)):

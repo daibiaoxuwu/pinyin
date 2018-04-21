@@ -149,13 +149,7 @@ decoder_logits = tf.reshape(decoder_logits_flat, (decoder_max_steps, decoder_bat
 decoder_prediction = tf.argmax(decoder_logits, 2)
 
 
-stepwise_cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
-    labels=tf.one_hot(decoder_targets, depth=vocab_size, dtype=tf.float32),
-    logits=decoder_logits,
-)
 
-loss = tf.reduce_mean(stepwise_cross_entropy)
-train_op = tf.train.AdamOptimizer().minimize(loss)
 
 def random_sequences(length_from, length_to, vocab_lower, vocab_upper, batch_size):
     def random_length():
@@ -193,7 +187,6 @@ def next_feed():
     return {
         encoder_inputs: encoder_inputs_,
         encoder_inputs_length: encoder_input_lengths_,
-        decoder_targets: decoder_targets_,
     }
 
 print('0')
@@ -201,8 +194,8 @@ saver=tf.train.Saver()
 with tf.Session() as sess:
     print('0')
     sess.run(tf.global_variables_initializer())
-    #ckpt = tf.train.get_checkpoint_state('tense/py3')
-    #saver.restore(sess, ckpt.model_checkpoint_path)
+    ckpt = tf.train.get_checkpoint_state('tense/py3')
+    saver.restore(sess, ckpt.model_checkpoint_path)
     print('1')
     batch_size = 100
 
@@ -219,20 +212,16 @@ with tf.Session() as sess:
     try:
         for batch in range(max_batches):
             fd = next_feed()
-            _, l = sess.run([train_op, loss], fd)
-            loss_track.append(l)
 
-            if batch == 0 or batch % batches_in_epoch == 0:
-                print('saved to: ', saver.save(sess,'tense/py3/py3.ckpt',global_step=batch))
-                print('batch {}'.format(batch)+'  minibatch loss: {}'.format(sess.run(loss, fd)))
-                predict_ = sess.run(decoder_prediction, fd)
-                for i, (inp, pred) in enumerate(zip(fd[encoder_inputs].T, predict_.T)):
-                    print('  sample {}:'.format(i + 1))
-                    print('    input     > {}'.format(inp))
-                    print('    predicted > {}'.format(pred))
-                    if i >= 2:
-                        break
-                print()
+            print('batch {}'.format(batch))
+            predict_ = sess.run(decoder_prediction, fd)
+            for i, (inp, pred) in enumerate(zip(fd[encoder_inputs].T, predict_.T)):
+                print('  sample {}:'.format(i + 1))
+                print('    input     > {}'.format(inp))
+                print('    predicted > {}'.format(pred))
+                if i >= 2:
+                    break
+            print()
 
     except KeyboardInterrupt:
         print('training interrupted')
