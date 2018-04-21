@@ -54,8 +54,8 @@ epochs = 30000001
 
 with tf.Session(graph=train_graph) as sess:
     sess.run(tf.global_variables_initializer())
-    ckpt = tf.train.get_checkpoint_state('tense/py')
-    saver.restore(sess, ckpt.model_checkpoint_path)
+#    ckpt = tf.train.get_checkpoint_state('tense/py')
+#    saver.restore(sess, ckpt.model_checkpoint_path)
     for epoch in range(1,epochs):
         answers,pads,inputs = model.list_tags(batch_size=batch_size)
 

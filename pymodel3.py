@@ -190,6 +190,9 @@ def next_feed():
     decoder_targets_, _ = make_batch(
         [(sequence) + [EOS] + [PAD] * 2 for sequence in batch]
     )
+    print('a',encoder_inputs_.shape)
+    print('b',np.array(encoder_input_lengths_).shape)
+    print('c',np.array(decoder_targets_).shape)
     return {
         encoder_inputs: encoder_inputs_,
         encoder_inputs_length: encoder_input_lengths_,
