@@ -21,7 +21,31 @@ def putdict(word,dic):
     else:
         dic[word]=1
 
-def listtags(text,smdict,sgdict):
+def loadvoice(path):
+    voicedict={}
+    rvdict={}
+    with open(path,encoding='gbk') as f:
+        a=f.readline()#.encode('gbk')
+        while(a!=''):
+            b=a.split()
+            rvdict[b[0]]=b[1:]
+            for c in b[1:]:
+                voicedict[c]=b[0]
+            a=f.readline()
+    return rvdict,voicedict
+def wordtopy(text,voicedict):
+    voice=''
+    for i in text:
+        if i in voicedict:
+            voice+=voicedict[i]
+            voice+=' '
+        else:
+            voice+='unk'
+            voice+=' '
+    return voice
+
+
+def listtags(text,smdict,sgdict,rvdict,voicedict):
     result = jieba.cut_for_search(text)        ##搜索引擎模式
     
     for text in result:
@@ -29,14 +53,20 @@ def listtags(text,smdict,sgdict):
             putdict(text,sgdict)
         else:
             smtext=text[1:]
+            smvoice=wordtopy(smtext,voicedict)#后面几个字的注音
+
+                    
             if text[0] in smdict:
-                bigdict=smdict[text[0]]
-                if smtext in bigdict:
-                    bigdict[smtext]+=1
+                if smvoice in smdict[text[0]]:
+                    bigdict=smdict[text[0]][smvoice]        #格式:{'科':{'xue ':{'学':10,'雪':1},'xue jia ':{'学家':2}...(后面都有空格)
+                    if smtext in bigdict:
+                        bigdict[smtext]+=1
+                    else:
+                        bigdict[smtext]=1
                 else:
-                    bigdict[smtext]=1
+                    smdict[text[0]][smvoice]={smtext:1}
             else:
-                smdict[text[0]]={smtext:1}
+                smdict[text[0]]={smvoice:{smtext:1}}
     return smdict,sgdict
 
 if __name__ == "__main__":
@@ -44,14 +74,16 @@ if __name__ == "__main__":
     #语料句子
     smdict={}
     sgdict={}
+    rvdict,voicedict=loadvoice('../拼音汉字表.txt')
+#    print(listtags('小明硕士毕业于中国科学院计算所，后在日本京都大学深造',smdict,sgdict,rvdict,voicedict))
+
     for _ in range(1,12):
         #text=open('../sina_news/2016-%02d.txt'%_).read()
         for text in open('../sina_news/2016-%02d.txt'%_).readlines():
-            smdict,sgdict=listtags(json.loads(text)['html'],smdict,sgdict)
-            smdict,sgdict=listtags(json.loads(text)['title'],smdict,sgdict)
+            smdict,sgdict=listtags(json.loads(text)['html'],smdict,sgdict,rvdict,voicedict)
+            smdict,sgdict=listtags(json.loads(text)['title'],smdict,sgdict,rvdict,voicedict)
         print('one')
     with open('../jiebasm','wb') as f:
         pickle.dump(smdict,f)
     with open('../jiebasg','wb') as f:
         pickle.dump(sgdict,f)
-
