@@ -1,5 +1,6 @@
 import pickle
 import json
+import re
 from pypinyin import pinyin, lazy_pinyin, Style
 
 
@@ -13,6 +14,7 @@ def reform(sentence):
     sentence_modify2="BOS"+sentence_modify1+"EOS"
     return sentence_modify2
 def listtags(text,smdict,f):
+    text=re.sub('\s+','.',text)
     f.write(text+'\n')
     f.write(' '.join(lazy_pinyin(text,errors='ignore'))+'\n')
     return

@@ -1,5 +1,6 @@
 #encoding:utf-8
 #reader.py 只看含有一个动词的句子(十分之一左右)
+import pickle
 
 
 if __name__ == '__main__':
