@@ -106,23 +106,63 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
 
 
     for en in range(1,len(line)):#i 拼音
+        print(power)
+        input()
+        print(rightsent)
+        input()
         for wd in jiebasg:
             if wd in voicedict and voicedict[wd]==line[en]:
                     for odwd in power[en-1]:
+                            if wd=='什':print('v',wd)
                             if odwd in jiebasm3 and wd in jiebasm3[odwd] and '' in jiebasm3[odwd][wd]:
                                 score=power[en-1][odwd] + jiebasm3[odwd][wd][''][''] + jiebasg[wd]  #跨词权重
                             else:
                                 score=power[en-1][odwd] + jiebasg[wd]
                             if wd not in power[en] or (wd in power[en] and power[en][wd]<score):
+                                print('x',wd)
                                 power[en][wd]=score
 #                                print(en,wd,enen,odwd,power[enen][odwd])
                                 rightsent[en][wd]=rightsent[en-1][odwd]+wd
+
+        for wd in rvdict[line[en]]:
+                    if line[en]=='shen' :print(wd)
+                    for odwd in power[en-1]:
+                            score=power[en-1][odwd] 
+                            if wd not in power[en] or (wd in power[en] and power[en][wd]<score):
+                                power[en][wd]=score
+                                print('e',wd)
+#                                print(en,wd,enen,odwd,power[enen][odwd])
+                                rightsent[en][wd]=rightsent[en-1][odwd]+wd
+
+
+        for wd in power[en-1]:
+            if len(wd)==1 and wd in jiebasm:
+                if wd=='什':print('v',wd,score)
+                for i in jiebasm[wd]:
+                    if wd=='什':print('e',i,voicedict['么'])
+                    if len(i)==1 and i==line[en]:
+                        print('o',wd)
+                        for j in jiebasm[wd][i]:#同音字
+                            for stst in range(1,en-2):
+                                for odwd in power[stst]:
+                                        if odwd in jiebasm3 and wd in jiebasm3[odwd] and i in jiebasm3[odwd][wd]:
+                                            score=power[stst][odwd] + valuewd2(odwd,wd,i,j)
+                                        else:
+                                            score=power[stst][odwd] + valuewd(wd,i,j)
+                                            if wd=='什':print('v',wd,score)
+
+                                           # input()
+                                        if wd+j not in power[en-1] or (wd+j in power[en-1] and power[en-1][wd+j]<score):
+                                            print('d',wd)
+                                            power[en-1][wd+j]=score
+                                            rightsent[en-1][wd+j]=rightsent[stst][odwd]+wd+j
 
         for wd in jiebasm:
             for stst in range(1,en-1):
                 if wd in voicedict and voicedict[wd]==line[stst+1]:
                     for i in jiebasm[wd]:
                         if len(i.split())==en-1-stst and i.split()==line[stst+2:en+1]:
+                            print('m',wd)
                             for j in jiebasm[wd][i]:#同音字
                                     for odwd in power[stst]:
                                             if odwd in jiebasm3 and wd in jiebasm3[odwd] and i in jiebasm3[odwd][wd]:
@@ -132,9 +172,11 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
 
                                                # input()
                                             if wd+j not in power[en] or (wd+j in power[en] and power[en][wd+j]<score):
+                                                print('p',wd)
                                                 power[en][wd+j]=score
                                                 rightsent[en][wd+j]=rightsent[stst][odwd]+wd+j
     maxwd=-1
+    ans='error'
     for i in power[len(line)-1]:
         if power[len(line)-1][i]>maxwd:
             maxwd=power[len(line)-1][i]
@@ -154,8 +196,8 @@ if __name__ == "__main__":
     #jiebasm3={'硕士': {'毕': {'ye': {'业': 1}}}, '毕业': {'于': {'': {'': 1}}}, '中国科学院': {'计': {'suan suo': {'算所': 1}}}, '于': {'中': {'guo ke xue yuan': {'国科学院': 1}}}, 'BOF': {'小': {'ming': {'明': 1}}}, '小明': {'硕': {'shi': {'士': 1}}}}
     #jiebasg={'于': 1}
     #小明硕士毕业于中国科学院计算所，后在日本京都大学深造"
-    '''
     a='xiao ming shuo shi bi ye yu zhong guo ke xue yuan ji suan suo hou zai ri ben jing du da xue shen zao'
+    a='ni wei shen me zhe me shu lian a'
     print(work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict))
     '''
     with open('../input.txt') as f:
@@ -165,4 +207,20 @@ if __name__ == "__main__":
                 ans=work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict)
                 print(ans)
                 g.write(ans)
+                a=f.readline()
+    '''
+    total=0
+    right=0
+    with open('../output1.txt',encoding='utf-8') as g:
+        with open('../input1.txt') as f:
+            a=f.readline()
+            while a!='':
+                ans=work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict)
+                if ans=='error':
+                    print(a)
+                    input()
+                trueans=g.readline()
+                if ans==trueans[:-1]: right+=1
+                total+=1
+                print(right,total,right/total,ans,trueans[:-1])
                 a=f.readline()
