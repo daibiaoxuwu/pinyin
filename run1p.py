@@ -46,18 +46,21 @@ def work(line,smdict,rvdict,voicedict,pointset):
     oldsent=rvdict[line[0]]
     oldpower=[1]*len(oldlist)
     
-    for i in line[1:]:#i 拼音
-        newlist=rvdict[i]
+    for i in range(1,len(line)):#i 拼音
+        newlist=rvdict[line[i]]
         newpower=[0]*len(newlist)
         newsent=['']*len(newlist)
         for j in range(len(newlist)):#j:汉字
             for k in range(len(oldlist)):
                 #print(smdict[oldlist[k]])
-                if oldlist[k] in smdict:
-                    if (oldlist[k]+newlist[j]) in smdict[oldlist[k]]:
-                        if newpower[j]<smdict[oldlist[k]][oldlist[k]+newlist[j]] + oldpower[k]:
-                            newpower[j]=smdict[oldlist[k]][oldlist[k]+newlist[j]] + oldpower[k]
-                            newsent[j]=oldsent[k]+newlist[j]
+                
+                if line[i-1] in smdict:
+                    if oldlist[k] in smdict[line[i-1]]:
+                        if line[i] in smdict[line[i-1]][oldlist[k]]:
+                            if newlist[j] in smdict[line[i-1]][oldlist[k]][line[i]]:
+                                if newpower[j]<smdict[line[i-1]][oldlist[k]][line[i]][newlist[j]] + oldpower[k]:
+                                    newpower[j]=smdict[line[i-1]][oldlist[k]][line[i]][newlist[j]] + oldpower[k]
+                                    newsent[j]=oldsent[k]+newlist[j]
         oldlist=newlist
         oldpower=newpower
         oldsent=newsent
@@ -73,7 +76,7 @@ def work(line,smdict,rvdict,voicedict,pointset):
 if __name__ == "__main__":
 
 #    with open('dict2clog','rb') as f:
-    with open('dict2c','rb') as f:
+    with open('dict2p','rb') as f:
         smdict=pickle.load(f)
 
     rvdict,voicedict=loadvoice('../拼音汉字表.txt')
