@@ -15,7 +15,7 @@ from queue import Queue
 
 
 class reader(object):
-    def __init__(self, maxlength=50):
+    def __init__(self, maxlength=10):
 
 #patchlength:每次输入前文额外的句子的数量.
 #maxlength:每句话的最大长度.(包括前文额外句子).超过该长度的句子会被丢弃.
@@ -45,23 +45,22 @@ class reader(object):
             for j in range(len(self.rvdict[i])):
                 self.maxj=max(self.maxj,j)
                 self.widict[self.rvdict[i][j]]=j
-        #        print(self.rvdict[i][j],j)
+        self.rvdict['lve']=self.rvdict['lue'][:]
         print(self.maxj)
         
        # with open(dir0+'widict', 'rb') as f:
        #     self.widict = pickle.load(f)        #汉字
        # print('w',len(self.widict))
 
-        self.resp=open('../pinyin').readlines()
+        self.resp=open('../pinyin2').readlines()
         self.readlength=len(self.resp)
         self.pointer=0
         
 
     def work(self,a1,b1,inputs,answers):
-#        for i in a1:
-#            if i not in self.widict:
-#                self.widict[i]=len(self.widict)
-        aa=[self.widict[i]+2 for i in a1]
+        aa=[]
+        for i in range(len(a1)):
+            aa.append(self.rvdict[b1[i]].index(a1[i])+2)
 
  #       for i in b1:
  #           if i not in self.vidict:
@@ -112,5 +111,5 @@ class reader(object):
 
 if __name__ == '__main__':
     model = reader()
-    model.list_tags(20000)
+    print(model.list_tags(1))
 
