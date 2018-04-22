@@ -40,13 +40,28 @@ def loadvoice(path):
     return rvdict,voicedict
 
 def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
+    jiebasg2=dict()
     for i in jiebasg:
-        jiebasg[i]=math.log(jiebasg[i])-1
+        try:
+            jiebasg2[i]=math.log(jiebasg[i]+0.1)-1
+        except Exception as e:
+            print(jiebasg[i])
+            raise e
+    jiebasg=jiebasg2
+    jiebasm2=dict()
+    def putdict(dic,wd,p):
+        if wd not in dic:
+            dic[wd]=p
+        return
+
+        
     for i in jiebasm:
         for j in jiebasm[i]:
             for r in jiebasm[i][j]:
-                jiebasm[i][j][r]=math.log(jiebasm[i][j][r])
-    print('guiyihua')
+                putdict(jiebasm2,i,{})
+                putdict(jiebasm2[i],j,{})
+                putdict(jiebasm2[i][j],r,math.log(jiebasm[i][j][r]+0.1))
+    jiebasm=jiebasm2
 
     def valuewd(wd,i,j):#wd 第一个字 i 拼音 j 后面的所有字
         value= jiebasm[wd][i][j]#*pow(len(i.split())+1,2)
@@ -82,24 +97,15 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
     for wd in jiebasm:
         if wd in voicedict and voicedict[wd]==line[0]:
 #            if wd=='小':
-#                print(wd,jiebasm[wd])
-#                input()
             for i in jiebasm[wd]:
                 if i.split()==line[1:1+len(i.split())]:
                     for j in jiebasm[wd][i]:                            #同音字
                         rightsent[len(i.split())][wd+j]=wd+j
                         power[len(i.split())][wd+j]=valuewd(wd,i,j)
 #                else:
-#                    print(i.split(),line[1:1+len(i.split())])
-    print(power)
 
 
     for en in range(1,len(line)):#i 拼音
-        print('-----',en)
-        for i in power[en-1]:
-            print(rightsent[en-1][i],i,power[en-1][i])
-        print('-----')
-        input()
         for wd in jiebasg:
             if wd in voicedict and voicedict[wd]==line[en]:
                     for odwd in power[en-1]:
@@ -111,38 +117,25 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
                                 power[en][wd]=score
 #                                print(en,wd,enen,odwd,power[enen][odwd])
                                 rightsent[en][wd]=rightsent[en-1][odwd]+wd
-                            if voicedict[wd]=='zao':
-                                print(odwd,en,wd,rightsent[en-1][odwd])
 
         for wd in jiebasm:
             for stst in range(1,en-1):
                 if wd in voicedict and voicedict[wd]==line[stst+1]:
                     for i in jiebasm[wd]:
                         if len(i.split())==en-1-stst and i.split()==line[stst+2:en+1]:
-                            print(wd,i,'dfadfadf')
-                            print(jiebasm[wd][i])
                             for j in jiebasm[wd][i]:#同音字
                                     for odwd in power[stst]:
-                                            print(odwd,wd,i,j)
-                                            if wd=='深' and i=='zao ':
-                                                print(i,line[stst+2:en+1],stst,en)
                                             if odwd in jiebasm3 and wd in jiebasm3[odwd] and i in jiebasm3[odwd][wd]:
-#                                                print(odwd,wd,i,j,jiebasm[wd][i],jiebasm3[odwd][wd])
                                                 score=power[stst][odwd] + valuewd2(odwd,wd,i,j)
                                             else:
                                                 score=power[stst][odwd] + valuewd(wd,i,j)
 
-                                            print(score)
-                                            if wd=='毕' and i=='ye ':
-                                                print(i,line[stst+2:en+1],stst,en)
                                                # input()
                                             if wd+j not in power[en] or (wd+j in power[en] and power[en][wd+j]<score):
                                                 power[en][wd+j]=score
                                                 rightsent[en][wd+j]=rightsent[stst][odwd]+wd+j
     maxwd=-1
-    print(power)
     for i in power[len(line)-1]:
-        print(rightsent[len(line)-1][i],i,power[len(line)-1][i])
         if power[len(line)-1][i]>maxwd:
             maxwd=power[len(line)-1][i]
             ans=rightsent[len(line)-1][i]
@@ -168,5 +161,5 @@ if __name__ == "__main__":
     with open('../input.txt') as f:
         a=f.readline()
         while a!='':
-            print(work(a,jiebasm,jiebasg,rvdict,voicedict))
+            print(work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict))
             a=f.readline()

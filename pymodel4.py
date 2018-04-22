@@ -16,7 +16,7 @@ EOS = 1
 # GO  = 3
 
 vocab_size = 406
-input_embedding_size = 20
+input_embedding_size = 100
 
 encoder_hidden_units = 20
 decoder_hidden_units = encoder_hidden_units * 2
@@ -223,8 +223,8 @@ def next_feed():
 saver=tf.train.Saver()
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    #ckpt = tf.train.get_checkpoint_state('tense/py4')
-    #saver.restore(sess, ckpt.model_checkpoint_path)
+    ckpt = tf.train.get_checkpoint_state('tense/py4')
+    saver.restore(sess, ckpt.model_checkpoint_path)
 
 
     print('head of the batch:')
@@ -243,7 +243,7 @@ with tf.Session() as sess:
             loss_track.append(l)
 
             if batch == 0 or batch % batches_in_epoch == 0:
-                print('saved to: ', saver.save(sess,'tense/py4/py4.ckpt',global_step=batch))
+                print('saved to: ', saver.save(sess,'tense/py5/py5.ckpt',global_step=batch))
                 print('batch {}'.format(batch)+'  minibatch loss: {}'.format(sess.run(loss, fd)))
                 predict_ = sess.run(decoder_prediction, fd)
                 for i, (inp,ans, pred) in enumerate(zip(fd[encoder_inputs].T,fd[decoder_targets].T, predict_.T)):

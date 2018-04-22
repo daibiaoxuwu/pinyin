@@ -56,38 +56,61 @@ class reader(object):
 
     def work(self,a1,b1,inputs,answers):
         aa=[]
-        for i in range(len(a1)):
-            if b1[i]=='nve': b1[i]='nue'
-            if b1[i]=='lve': b1[i]='lue'
-            if b1[i]=='n': b1[i]='en'
-            if b1[i]=='bia': b1[i]='bian'
-            if b1[i]=='cho': b1[i]='chou'
-            if b1[i]=='puo': b1[i]='po'
-            if b1[i]=='yie': b1[i]='ye'
-            if b1[i] not in self.rvdict:
-                print('allnotin',b1[i],a1[i])
-                return False
-            if a1[i] in self.rvdict[b1[i]]:
-                aa.append(self.rvdict[b1[i]].index(a1[i])+2)
+        bb=[]
+        ra=''
+        rb=''
+        for i in range(self.maxlength):
+            if len(b1)==0 or len(a1)==0:break
+            if b1[0]=='nve': b1[0]='nue'
+            if b1[0]=='lve': b1[0]='lue'
+            if b1[0]=='n': b1[0]='en'
+            if b1[0]=='bia': b1[0]='bian'
+            if b1[0]=='cho': b1[0]='chou'
+            if b1[0]=='puo': b1[0]='po'
+            if b1[0]=='yie': b1[0]='ye'
+            if b1[0] not in self.rvdict:
+                print('allnotin',b1[0],a1[0])
+                a1=a1[1:]
+                b1=b1[1:]
+                print(ra,rb)
+                inputs.append(aa)
+                answers.append(bb)
+                return a1,b1
+            if a1[0] in self.rvdict[b1[0]]:
+                aa.append(self.rvdict[b1[0]].index(a1[0])+2)
+                ra+=a1[0]
             else:
-                #print('er',b1[i],a1[i])
-                #print('er2',self.rvdict[b1[i]])
-            #    print(self.rvdict[b1[i]].index(a1[i]))
-                return False
+                print('er',b1[0],a1[0])
+                print('er2',self.rvdict[b1[0]])
+                if a1[0] in self.rvdict[b1[1]]:
+                    aa.append(self.rvdict[b1[1]].index(a1[0])+2)
+                    ra+=a1[0]
+                    b1=b1[1:]
+                else:
+                    inputs.append(aa)
+                    answers.append(bb)
+                    print('er3',b1[1],a1[0])
+                    print('er4',self.rvdict[b1[1]])
+                    a1=a1[1:]
+                    b1=b1[1:]
+                    inputs.append(aa)
+                    answers.append(bb)
+                    print(ra,rb)
+                    return a1,b1
+            if b1[0] not in self.vidict:
+                self.vidict[b1[0]]=len(self.vidict)
+                print(b1[0])
+            rb+=b1[0]
+            rb+=' '
+            bb.append(self.vidict[b1[0]]+2)
+            a1=a1[1:]
+            b1=b1[1:]
 
 
-        for i in b1:
-            if i not in self.vidict:
-                self.vidict[i]=len(self.vidict)
-                print(i)
-        bb=[self.vidict[i]+2 for i in b1]
-
-#补零
-        if(len(aa)!=len(bb)):
-            return False
+        print(ra,rb)
         inputs.append(aa)
         answers.append(bb)
-        return True
+        return a1,b1
 
     def list_tags(self,batch_size):
         while True:#防止读到末尾
@@ -111,21 +134,11 @@ class reader(object):
                 b=self.resp[self.pointer+1].split()#拼音
                 self.pointer+=2
                 flag=0
-                while len(a)>self.maxlength:
-                    a1=a[:self.maxlength]
-                    b1=b[:self.maxlength]
-                    a=a[self.maxlength:]
-                    b=b[self.maxlength:]
-                    if self.work(a1,b1,inputs,answers)==False:
-                        flag=1
-                        break
+                while len(a)>0:
+                    a,b=self.work(a,b,inputs,answers)
                     if len(inputs)>=batch_size:
                         return inputs,answers
 
-                if flag==1: continue
-                if len(inputs)>=batch_size:
-                    return inputs,answers
-                if self.work(a,b,inputs,answers)==False:continue
             return inputs,answers
 
 if __name__ == '__main__':
