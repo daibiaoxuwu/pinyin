@@ -101,6 +101,8 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
                                 power[en][wd]=score
 #                                print(en,wd,enen,odwd,power[enen][odwd])
                                 rightsent[en][wd]=rightsent[enen][odwd]+wd
+                            if voicedict[wd]=='zao':
+                                print(enen,odwd,en,wd,rightsent[enen][odwd])
 
         for wd in jiebasm:
             for stst in range(1,en-1):
@@ -108,7 +110,6 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
                     for i in jiebasm[wd]:
                         if wd=='深' and i=='zao ':
                             print(i,line[stst+2:en+1],stst,en)
-                            input()
                         if len(i.split())==en-1-stst and i.split()==line[stst+2:en+1]:
                             print(wd,i,'dfadfadf')
                             print(jiebasm[wd][i])
@@ -117,7 +118,6 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
                                             print(odwd,wd,i,j)
                                             if wd=='深' and i=='zao ':
                                                 print(i,line[stst+2:en+1],stst,en)
-                                                input()
                                             if odwd in jiebasm3 and wd in jiebasm3[odwd] and i in jiebasm3[odwd][wd]:
 #                                                print(odwd,wd,i,j,jiebasm[wd][i],jiebasm3[odwd][wd])
                                                 score=power[stst][odwd] + valuewd2(odwd,wd,i,j)
@@ -130,7 +130,7 @@ def work(line,jiebasm3,jiebasm,jiebasg,rvdict,voicedict):
     maxwd=-1
     print(power)
     for i in power[len(line)-1]:
-        print(i,power[len(line)-1][i]),rightsent[len(line)-1][i]
+        print(i,power[len(line)-1][i],rightsent[len(line)-1][i])
         if power[len(line)-1][i]>maxwd:
             maxwd=power[len(line)-1][i]
             ans=rightsent[len(line)-1][i]
