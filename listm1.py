@@ -12,18 +12,22 @@ def reform(sentence):
     sentence_modify2="BOS"+sentence_modify1+"EOS"
     return sentence_modify2
 def listtags(text,smdict):
-    for i in range(0,len(text)-1):
-        smtext=text[i:i+3]
+    for i in range(0,len(text)-2):
         word=text[i]
         word2=text[i+1]
+        word3=text[i+2]
         if word in smdict:
             bigdict=smdict[word]
-            if smtext in bigdict:
-                bigdict[smtext]+=1
+            if word2 in bigdict:
+                thrdict=bigdict[word2]
+                if word3 in thrdict:
+                    thrdict[word3]+=1
+                else:
+                    thrdict[word3]=1
             else:
-                bigdict[smtext]=1
+                bigdict[word2]={word3:1}
         else:
-            smdict[word]={smtext:1}
+            smdict[word]={word2:{word3:1}}
     return smdict
 
 if __name__ == "__main__":
