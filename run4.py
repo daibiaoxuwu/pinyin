@@ -166,7 +166,10 @@ if __name__ == "__main__":
     print(work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict))
     '''
     with open('../input.txt') as f:
-        a=f.readline()
-        while a!='':
-            print(work(a,jiebasm,jiebasg,rvdict,voicedict))
+        with open('../output.txt','w') as g:
             a=f.readline()
+            while a!='':
+                ans=work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict)
+                print(ans)
+                g.write(ans)
+                a=f.readline()

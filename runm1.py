@@ -82,10 +82,7 @@ if __name__ == "__main__":
         pointset= pickle.load(f)
 
     with open('../input.txt') as f:
-        with open('../output.txt','w') as g:
+        a=f.readline()
+        while a!='':
+            print(work(a,smdict,rvdict,voicedict,pointset))
             a=f.readline()
-            while a!='':
-                ans=work(a,smdict,rvdict,voicedict,pointset)
-                print(ans)
-                g.write(ans)
-                a=f.readline()
