@@ -2,9 +2,9 @@
 import numpy as np
 import tensorflow as tf
 import os
-from pyreader4 import reader
+from pyreader4test import reader
 model=reader()
-#os.environ["CUDA_VISIBLE_DEVICES"]=""#环境变量：使用第一块gpu
+os.environ["CUDA_VISIBLE_DEVICES"]=""#环境变量：使用第一块gpu
 
 
 tf.reset_default_graph()
@@ -38,6 +38,7 @@ encoder_cell = LSTMCell(encoder_hidden_units)
 
 
 
+print('1')
 
 
 
@@ -150,13 +151,7 @@ decoder_logits = tf.reshape(decoder_logits_flat, (decoder_max_steps, decoder_bat
 decoder_prediction = tf.argmax(decoder_logits, 2)
 
 
-stepwise_cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
-    labels=tf.one_hot(decoder_targets, depth=vocab_size, dtype=tf.float32),
-    logits=decoder_logits,
-)
 
-loss = tf.reduce_mean(stepwise_cross_entropy)
-train_op = tf.train.AdamOptimizer().minimize(loss)
 
 def random_sequences(length_from, length_to, vocab_lower, vocab_upper, batch_size):
     def random_length():
@@ -186,45 +181,23 @@ def make_batch(inputs, max_sequence_length=None):
 
 
 def next_feed():
-    answers,inputs = model.list_tags(batch_size=batch_size)
-    if answers==None:
-        print('epoch')
-        answers,inputs = model.list_tags(batch_size=batch_size)
+    inputs=[]
+    with open('../input.txt') as f:
+        for i in f.readlines():
+            inputs.extend(model.list_tags(i))
+
     encoder_inputs_, encoder_input_lengths_ = make_batch(inputs)
-    decoder_targets_, _ = make_batch(
-        [(sequence) + [EOS] + [PAD] * 2 for sequence in answers]
-    )
-  #  print('a',encoder_inputs_.shape)
-  #  print('b',np.array(encoder_input_lengths_).shape)
-  #  print('c',np.array(decoder_targets_).shape)
     return {
         encoder_inputs: encoder_inputs_,
         encoder_inputs_length: encoder_input_lengths_,
-        decoder_targets: decoder_targets_,
     }
-    '''
-def next_feed():
-    answers,inputs = model.list_tags(batch_size=batch_size)
-    answers=np.array(answers).T.tolist()
-    pads=np.array(pads).T.tolist()
-    inputs=np.array(inputs).T.tolist()
-    print('a',np.array(answers).shape)
-    print('b',np.array(pads).shape)
-    print('c',np.array(inputs).shape)
-    print('a',type(answers[0]))
-    print('b',type(pads[0]))
-    print('c',type(inputs[0]))
-    return {
-        encoder_inputs: inputs,
-        encoder_inputs_length: pads,
-        decoder_targets: answers
-    }
-'''
+
+print('0')
 saver=tf.train.Saver()
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    #ckpt = tf.train.get_checkpoint_state('tense/py4')
-    #saver.restore(sess, ckpt.model_checkpoint_path)
+    ckpt = tf.train.get_checkpoint_state('tense/py4')
+    saver.restore(sess, ckpt.model_checkpoint_path)
 
 
     print('head of the batch:')
@@ -239,21 +212,16 @@ with tf.Session() as sess:
     try:
         for batch in range(max_batches):
             fd = next_feed()
-            _, l = sess.run([train_op, loss], fd)
-            loss_track.append(l)
 
-            if batch == 0 or batch % batches_in_epoch == 0:
-                print('saved to: ', saver.save(sess,'tense/py4/py4.ckpt',global_step=batch))
-                print('batch {}'.format(batch)+'  minibatch loss: {}'.format(sess.run(loss, fd)))
-                predict_ = sess.run(decoder_prediction, fd)
-                for i, (inp,ans, pred) in enumerate(zip(fd[encoder_inputs].T,fd[decoder_targets].T, predict_.T)):
-                    print('  sample {}:'.format(i + 1))
-                    print('    input     > {}'.format(inp))
-                    print('    answer    > {}'.format(ans))
-                    print('    predicted > {}'.format(pred))
-                    if i >= 2:
-                        break
-                print()
+            print('batch {}'.format(batch))
+            predict_ = sess.run(decoder_prediction, fd)
+            for i, (inp, pred) in enumerate(zip(fd[encoder_inputs].T, predict_.T)):
+                print('  sample {}:'.format(i + 1))
+                print('    input     > {}'.format(inp))
+                print('    predicted > {}'.format(pred))
+                if i >= 2:
+                    break
+            print()
 
     except KeyboardInterrupt:
         print('training interrupted')
