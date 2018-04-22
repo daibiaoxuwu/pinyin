@@ -15,7 +15,7 @@ EOS = 1
 # UNK = 2
 # GO  = 3
 
-vocab_size = 672
+vocab_size = 406
 input_embedding_size = 20
 
 encoder_hidden_units = 20
