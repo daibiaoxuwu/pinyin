@@ -24,9 +24,7 @@ class reader(object):
 
         
         dir0=''
-        with open(dir0+'vidict', 'rb') as f:
-            self.vidict = pickle.load(f)        #pinyin
-        print('v',len(self.vidict))
+        self.vidict = {}
 
         self.voicedict={}
         self.rvdict={}
@@ -45,7 +43,6 @@ class reader(object):
             for j in range(len(self.rvdict[i])):
                 self.maxj=max(self.maxj,j)
                 self.widict[self.rvdict[i][j]]=j
-        self.rvdict['lve']=self.rvdict['lue'][:]
         print(self.maxj)
         
        # with open(dir0+'widict', 'rb') as f:
@@ -60,11 +57,29 @@ class reader(object):
     def work(self,a1,b1,inputs,answers):
         aa=[]
         for i in range(len(a1)):
-            aa.append(self.rvdict[b1[i]].index(a1[i])+2)
+            if b1[i]=='nve': b1[i]='nue'
+            if b1[i]=='lve': b1[i]='lue'
+            if b1[i]=='n': b1[i]='en'
+            if b1[i]=='bia': b1[i]='bian'
+            if b1[i]=='cho': b1[i]='chou'
+            if b1[i]=='puo': b1[i]='po'
+            if b1[i]=='yie': b1[i]='ye'
+            if b1[i] not in self.rvdict:
+                print('allnotin',b1[i],a1[i])
+                return False
+            if a1[i] in self.rvdict[b1[i]]:
+                aa.append(self.rvdict[b1[i]].index(a1[i])+2)
+            else:
+                #print('er',b1[i],a1[i])
+                #print('er2',self.rvdict[b1[i]])
+            #    print(self.rvdict[b1[i]].index(a1[i]))
+                return False
 
- #       for i in b1:
- #           if i not in self.vidict:
- #               self.vidict[i]=len(self.vidict)
+
+        for i in b1:
+            if i not in self.vidict:
+                self.vidict[i]=len(self.vidict)
+                print(i)
         bb=[self.vidict[i]+2 for i in b1]
 
 #补零
@@ -95,15 +110,19 @@ class reader(object):
                 '''
                 b=self.resp[self.pointer+1].split()#拼音
                 self.pointer+=2
+                flag=0
                 while len(a)>self.maxlength:
                     a1=a[:self.maxlength]
                     b1=b[:self.maxlength]
-                    if self.work(a1,b1,inputs,answers)==False:continue
+                    a=a[self.maxlength:]
+                    b=b[self.maxlength:]
+                    if self.work(a1,b1,inputs,answers)==False:
+                        flag=1
+                        break
                     if len(inputs)>=batch_size:
                         return inputs,answers
 
-                    a=a[self.maxlength:]
-                    b=b[self.maxlength:]
+                if flag==1: continue
                 if len(inputs)>=batch_size:
                     return inputs,answers
                 if self.work(a,b,inputs,answers)==False:continue
@@ -111,5 +130,6 @@ class reader(object):
 
 if __name__ == '__main__':
     model = reader()
-    print(model.list_tags(1))
+    model.list_tags(10000000)
+    print(len(model.vidict))
 

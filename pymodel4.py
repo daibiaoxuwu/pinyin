@@ -251,7 +251,7 @@ with tf.Session() as sess:
                     print('    input     > {}'.format(inp))
                     print('    answer    > {}'.format(ans))
                     print('    predicted > {}'.format(pred))
-                    if i >= 2:
+                    if i >= 0:
                         break
                 print()
 

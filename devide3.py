@@ -60,7 +60,7 @@ def listtags(text0,voice,smdict,sgdict,rvdict,voicedict):
         if len(text)>1:
             smtext=text[1:]
             smvoice=' '.join(voice[text0.index(text)+1:text0.index(text)+len(text)])#wordtopy(smtext,voicedict)#后面几个字的注音
-            print(voice[text0.index(text)+1:text0.index(text)+len(text)],text)
+#            print(voice[text0.index(text)+1:text0.index(text)+len(text)],text)
         else:
             smtext=''
             smvoice=''
@@ -97,13 +97,13 @@ if __name__ == "__main__":
     
 
 
-    with open('../pinyin') as f:
+    with open('../pinyin2') as f:
         while True:
             a=f.readline()
             if a=='':
                 break
             b=f.readline().split()
             smdict,sgdict=listtags(a[:-1],b,smdict,sgdict,rvdict,voicedict)
-            print('one')
+        #    print('one')
     with open('../jiebasm3','wb') as f:
         pickle.dump(smdict,f)

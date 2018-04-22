@@ -1,3 +1,3 @@
 import pickle
-with open('jiebasm','rb') as f:
+with open('jiebasm3','rb') as f:
     print(pickle.load(f))

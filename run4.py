@@ -42,21 +42,27 @@ def work(line,jiebasm,jiebasg,rvdict,voicedict):
 
     line=line.split()
 
-    rightsent=['']*(len(line)+1)
-    rightsent[0]=['BOF']
+    rightsent=[{}]*(len(line)+1)
+#    rightsent[0]=['BOF']
 
     power=[0]*(len(line)+1)
     power[0]=0
 
-    for en in range(0,len(line)):#i 拼音
+    for wd in jiebasg:
+        if wd in voicedict and voicedict[wd]==line[0]:
+            rightsent[0][wd]=jiebasg[wd]        #初始 单个字权重
 
-        maxwd=-1
+    for en in range(1,len(line)):#i 拼音
+
         for wd in jiebasg:
-            if wd in voicedict and voicedict[wd]==line[en] and jiebasg[wd]>maxwd:
+            if wd in voicedict and voicedict[wd]==line[en]:
+                if wd in rightsent[en]:
+                    if rightsent[en][wd]>wdscore(
                 maxwd=jiebasg[wd]
                 rightwd=wd
         if maxwd>=0:
-            rightsent[en+1]=rightsent[en]+rightwd #第0个字出来的时候存到rightsent[1] rightsent[0]永远为0
+            if en==0:
+                rightsent[en+1]=rightsent[en]+rightwd #第0个字出来的时候存到rightsent[1] rightsent[0]永远为0
             power[en+1]=maxwd#一个词的power? power[0]:永远为0.第0个字出来的时候写道power[1]
             print(en,rightsent[en+1])
 
@@ -85,17 +91,19 @@ if __name__ == "__main__":
     rvdict,voicedict=loadvoice('../拼音汉字表.txt')
 #    with open('dict2clog','rb') as f:
     with open('../jiebasm3','rb') as f:
+        jiebasm3=pickle.load(f)
+    with open('jiebasm','rb') as f:
         jiebasm=pickle.load(f)
-    with open('../jiebasg3','rb') as f:
+    with open('jiebasg','rb') as f:
         jiebasg=pickle.load(f)
     '''
-    jiebasm={'硕士': {'毕': {'ye': {'业': 1}}}, '毕业': {'于': {'': {'': 1}}}, '中国科学院': {'计': {'suan suo': {'算所': 1}}}, '于': {'中': {'guo ke xue yuan': {'国科学院': 1}}}, 'BOF': {'小': {'ming': {'明': 1}}}, '小明': {'硕': {'shi': {'士': 1}}}}
+    jiebasm3={'硕士': {'毕': {'ye': {'业': 1}}}, '毕业': {'于': {'': {'': 1}}}, '中国科学院': {'计': {'suan suo': {'算所': 1}}}, '于': {'中': {'guo ke xue yuan': {'国科学院': 1}}}, 'BOF': {'小': {'ming': {'明': 1}}}, '小明': {'硕': {'shi': {'士': 1}}}}
     jiebasg={'于': 1}
 
     ''' 
     #小明硕士毕业于中国科学院计算所，后在日本京都大学深造"
     a='xiao ming shuo shi bi ye yu zhong guo ke xue yuan ji suan suo hou zai ri ben jing du da xue shen zao'
-    print(work(a,jiebasm,jiebasg,rvdict,voicedict))
+    print(work(a,jiebasm3,jiebasm,jiebasg,rvdict,voicedict))
     '''
     with open('../input.txt') as f:
         a=f.readline()
